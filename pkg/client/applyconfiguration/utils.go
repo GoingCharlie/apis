@@ -41,18 +41,28 @@ import (
 func ForKind(kind schema.GroupVersionKind) interface{} {
 	switch kind {
 	// Group=batch.volcano.sh, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithKind("CronJob"):
+		return &batchv1alpha1.CronJobApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("CronJobSpec"):
+		return &batchv1alpha1.CronJobSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("CronJobStatus"):
+		return &batchv1alpha1.CronJobStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("DependsOn"):
 		return &batchv1alpha1.DependsOnApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("Job"):
 		return &batchv1alpha1.JobApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("JobCondition"):
 		return &batchv1alpha1.JobConditionApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("JobReference"):
+		return &batchv1alpha1.JobReferenceApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("JobSpec"):
 		return &batchv1alpha1.JobSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("JobState"):
 		return &batchv1alpha1.JobStateApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("JobStatus"):
 		return &batchv1alpha1.JobStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("JobTemplateSpec"):
+		return &batchv1alpha1.JobTemplateSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("LifecyclePolicy"):
 		return &batchv1alpha1.LifecyclePolicyApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NetworkTopologySpec"):
