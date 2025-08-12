@@ -1,0 +1,422 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.6.0
+  creationTimestamp: null
+  name: cronjobs.batch.volcano.sh
+spec:
+  group: batch.volcano.sh
+  names:
+    kind: CronJob
+    listKind: CronJobList
+    plural: cronjobs
+    shortNames:
+    - cronvcjob
+    singular: cronjob
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: CronJob is the Schema for the cronjobs API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: 'Specification of the desired behavior of a cron job, including
+              the schedule. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+            properties:
+              concurrencyPolicy:
+                description: "Specifies how to treat concurrent executions of a Job.
+                  Valid values are: \n - \"Allow\" (default): allows CronJobs to run
+                  concurrently; - \"Forbid\": forbids concurrent runs, skipping next
+                  run if previous run hasn't finished yet; - \"Replace\": cancels
+                  currently running job and replaces it with a new one"
+                type: string
+              failedJobsHistoryLimit:
+                default: 1
+                description: The number of failed finished jobs to retain. This is
+                  a pointer to distinguish between explicit zero and not specified.
+                  Defaults to 3.
+                format: int32
+                type: integer
+              jobTemplate:
+                description: Specifies the job that will be created when executing
+                  a CronJob.
+                properties:
+                  metadata:
+                    description: 'Standard object''s metadata of the jobs created
+                      from this template. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata'
+                    type: object
+                  spec:
+                    description: 'Specification of the desired behavior of the job.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+                    properties:
+                      maxRetry:
+                        default: 3
+                        description: Specifies the maximum number of retries before
+                          marking this Job failed. Defaults to 3.
+                        format: int32
+                        type: integer
+                      minAvailable:
+                        description: The minimal available pods to run for this Job
+                          Defaults to the summary of tasks' replicas
+                        format: int32
+                        type: integer
+                      minSuccess:
+                        description: The minimal success pods to run for this Job
+                        format: int32
+                        minimum: 1
+                        type: integer
+                      networkTopology:
+                        description: NetworkTopology defines the NetworkTopology config,
+                          this field works in conjunction with network topology feature
+                          and hyperNode CRD.
+                        properties:
+                          highestTierAllowed:
+                            default: 1
+                            description: HighestTierAllowed specifies the highest
+                              tier that a job allowed to cross when scheduling.
+                            type: integer
+                          mode:
+                            default: hard
+                            description: Mode specifies the mode of the network topology
+                              constrain.
+                            enum:
+                            - hard
+                            - soft
+                            type: string
+                        type: object
+                      plugins:
+                        additionalProperties:
+                          items:
+                            type: string
+                          type: array
+                        description: Specifies the plugin of job Key is plugin name,
+                          value is the arguments of the plugin
+                        type: object
+                      policies:
+                        description: Specifies the default lifecycle of tasks
+                        items:
+                          description: LifecyclePolicy specifies the lifecycle and
+                            error handling of task and job.
+                          properties:
+                            action:
+                              description: The action that will be taken to the PodGroup
+                                according to Event. One of "Restart", "None". Default
+                                to None.
+                              type: string
+                            event:
+                              description: The Event recorded by scheduler; the controller
+                                takes actions according to this Event.
+                              enum:
+                              - '*'
+                              - PodPending
+                              - PodRunning
+                              - PodFailed
+                              - PodEvicted
+                              - Unknown
+                              - TaskCompleted
+                              - OutOfSync
+                              - CommandIssued
+                              - JobUpdated
+                              - TaskFailed
+                              type: string
+                            events:
+                              description: The Events recorded by scheduler; the controller
+                                takes actions according to this Events.
+                              items:
+                                description: Event represent the phase of Job, e.g.
+                                  pod-failed.
+                                enum:
+                                - '*'
+                                - PodPending
+                                - PodRunning
+                                - PodFailed
+                                - PodEvicted
+                                - Unknown
+                                - TaskCompleted
+                                - OutOfSync
+                                - CommandIssued
+                                - JobUpdated
+                                - TaskFailed
+                                type: string
+                              type: array
+                            exitCode:
+                              description: 'The exit code of the pod container, controller
+                                will take action according to this code. Note: only
+                                one of `Event` or `ExitCode` can be specified.'
+                              format: int32
+                              type: integer
+                            timeout:
+                              description: Timeout is the grace period for controller
+                                to take actions. Default to nil (take action immediately).
+                              type: string
+                          type: object
+                        type: array
+                      priorityClassName:
+                        description: If specified, indicates the job's priority.
+                        type: string
+                      queue:
+                        description: Specifies the queue that will be used in the
+                          scheduler, "default" queue is used this leaves empty.
+                        type: string
+                      runningEstimate:
+                        description: Running Estimate is a user running duration estimate
+                          for the job Default to nil
+                        type: string
+                      schedulerName:
+                        description: SchedulerName is the default value of `tasks.template.spec.schedulerName`.
+                        type: string
+                      tasks:
+                        description: Tasks specifies the task specification of Job
+                        items:
+                          description: TaskSpec specifies the task specification of
+                            Job.
+                          properties:
+                            dependsOn:
+                              description: Specifies the tasks that this task depends
+                                on.
+                              properties:
+                                iteration:
+                                  description: This field specifies that when there
+                                    are multiple dependent tasks, as long as one task
+                                    becomes the specified state, the task scheduling
+                                    is triggered or all tasks must be changed to the
+                                    specified state to trigger the task scheduling
+                                  type: string
+                                name:
+                                  description: Indicates the name of the tasks that
+                                    this task depends on, which can depend on multiple
+                                    tasks
+                                  items:
+                                    type: string
+                                  type: array
+                              type: object
+                            maxRetry:
+                              description: Specifies the maximum number of retries
+                                before marking this Task failed. Defaults to 3.
+                              format: int32
+                              type: integer
+                            minAvailable:
+                              description: The minimal available pods to run for this
+                                Task Defaults to the task replicas
+                              format: int32
+                              type: integer
+                            name:
+                              description: Name specifies the name of tasks
+                              type: string
+                            policies:
+                              description: Specifies the lifecycle of task
+                              items:
+                                description: LifecyclePolicy specifies the lifecycle
+                                  and error handling of task and job.
+                                properties:
+                                  action:
+                                    description: The action that will be taken to
+                                      the PodGroup according to Event. One of "Restart",
+                                      "None". Default to None.
+                                    type: string
+                                  event:
+                                    description: The Event recorded by scheduler;
+                                      the controller takes actions according to this
+                                      Event.
+                                    enum:
+                                    - '*'
+                                    - PodPending
+                                    - PodRunning
+                                    - PodFailed
+                                    - PodEvicted
+                                    - Unknown
+                                    - TaskCompleted
+                                    - OutOfSync
+                                    - CommandIssued
+                                    - JobUpdated
+                                    - TaskFailed
+                                    type: string
+                                  events:
+                                    description: The Events recorded by scheduler;
+                                      the controller takes actions according to this
+                                      Events.
+                                    items:
+                                      description: Event represent the phase of Job,
+                                        e.g. pod-failed.
+                                      enum:
+                                      - '*'
+                                      - PodPending
+                                      - PodRunning
+                                      - PodFailed
+                                      - PodEvicted
+                                      - Unknown
+                                      - TaskCompleted
+                                      - OutOfSync
+                                      - CommandIssued
+                                      - JobUpdated
+                                      - TaskFailed
+                                      type: string
+                                    type: array
+                                  exitCode:
+                                    description: 'The exit code of the pod container,
+                                      controller will take action according to this
+                                      code. Note: only one of `Event` or `ExitCode`
+                                      can be specified.'
+                                    format: int32
+                                    type: integer
+                                  timeout:
+                                    description: Timeout is the grace period for controller
+                                      to take actions. Default to nil (take action
+                                      immediately).
+                                    type: string
+                                type: object
+                              type: array
+                            replicas:
+                              description: Replicas specifies the replicas of this
+                                TaskSpec in Job
+                              format: int32
+                              type: integer
+                            template:
+                              $ref: '#/definitions/k8s.io~1api~1core~1v1~0PodTemplateSpec'
+                              description: Specifies the pod that will be created
+                                for this TaskSpec when executing a Job
+                            topologyPolicy:
+                              description: Specifies the topology policy of task
+                              enum:
+                              - none
+                              - best-effort
+                              - restricted
+                              - single-numa-node
+                              type: string
+                          type: object
+                        type: array
+                      ttlSecondsAfterFinished:
+                        description: ttlSecondsAfterFinished limits the lifetime of
+                          a Job that has finished execution (either Completed or Failed).
+                          If this field is set, ttlSecondsAfterFinished after the
+                          Job finishes, it is eligible to be automatically deleted.
+                          If this field is unset, the Job won't be automatically deleted.
+                          If this field is set to zero, the Job becomes eligible to
+                          be deleted immediately after it finishes.
+                        format: int32
+                        type: integer
+                      volumes:
+                        description: The volumes mount on Job
+                        items:
+                          description: VolumeSpec defines the specification of Volume,
+                            e.g. PVC.
+                          properties:
+                            mountPath:
+                              description: Path within the container at which the
+                                volume should be mounted.  Must not contain ':'.
+                              type: string
+                            volumeClaim:
+                              $ref: '#/definitions/k8s.io~1api~1core~1v1~0PersistentVolumeClaimSpec'
+                              description: VolumeClaim defines the PVC used by the
+                                VolumeMount.
+                            volumeClaimName:
+                              description: defined the PVC name
+                              type: string
+                          required:
+                          - mountPath
+                          type: object
+                        type: array
+                    type: object
+                type: object
+              schedule:
+                description: The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
+                type: string
+              startingDeadlineSeconds:
+                description: Optional deadline in seconds for starting the job if
+                  it misses scheduled time for any reason.  Missed jobs executions
+                  will be counted as failed ones.
+                format: int64
+                type: integer
+              successfulJobsHistoryLimit:
+                default: 3
+                description: The number of successful finished jobs to retain. This
+                  is a pointer to distinguish between explicit zero and not specified.
+                  Defaults to 3.
+                format: int32
+                type: integer
+              suspend:
+                description: This flag tells the controller to suspend subsequent
+                  executions, it does not apply to already started executions.  Defaults
+                  to false.
+                type: boolean
+              timeZone:
+                description: The time zone name for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones.
+                  If not specified, this will default to the time zone of the kube-controller-manager
+                  process. The set of valid time zone names and the time zone offset
+                  is loaded from the system-wide time zone database by the API server
+                  during CronJob validation and the controller manager during execution.
+                  If no system-wide time zone database can be found a bundled version
+                  of the database is used instead. If the time zone name becomes invalid
+                  during the lifetime of a CronJob or due to a change in host configuration,
+                  the controller will stop creating new new Jobs and will create a
+                  system event with the reason UnknownTimeZone. More information can
+                  be found in https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#time-zones
+                type: string
+            required:
+            - jobTemplate
+            - schedule
+            type: object
+          status:
+            description: 'Current status of a cron job. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+            properties:
+              active:
+                description: A list of pointers to currently running jobs.
+                items:
+                  properties:
+                    apiVersio:
+                      type: string
+                    kind:
+                      type: string
+                    name:
+                      type: string
+                    namespace:
+                      type: string
+                    resourceVersion:
+                      type: string
+                    uid:
+                      description: UID is a type that holds unique ID values, including
+                        UUIDs.  Because we don't ONLY use UUIDs, this is an alias
+                        to string.  Being a type captures intent and helps make sure
+                        that UIDs and names do not get conflated.
+                      type: string
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
+              lastScheduleTime:
+                description: Information when was the last time the job was successfully
+                  scheduled.
+                format: date-time
+                type: string
+              lastSuccessfulTime:
+                description: Information when was the last time the job successfully
+                  completed.
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
