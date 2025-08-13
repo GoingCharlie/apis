@@ -19,7 +19,6 @@ package v1alpha1
 import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"volcano.sh/apis/pkg/apis/bus/v1alpha1"
 )
 
@@ -465,20 +464,23 @@ type CronJobSpec struct {
 
 	// Optional deadline in seconds for starting the job if it misses scheduled
 	// time for any reason.  Missed jobs executions will be counted as failed ones.
+	// +kubebuilder:validation:Minimum=0
 	// +optional
 	StartingDeadlineSeconds *int64 `json:"startingDeadlineSeconds,omitempty" protobuf:"varint,2,opt,name=startingDeadlineSeconds"`
 
 	// Specifies how to treat concurrent executions of a Job.
 	// Valid values are:
-	//
 	// - "Allow" (default): allows CronJobs to run concurrently;
 	// - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet;
 	// - "Replace": cancels currently running job and replaces it with a new one
+	// +kubebuilder:default=Allow
+	// +kubebuilder:validation:Enum=Allow;Forbid;Replace
 	// +optional
 	ConcurrencyPolicy ConcurrencyPolicy `json:"concurrencyPolicy,omitempty" protobuf:"bytes,3,opt,name=concurrencyPolicy,casttype=ConcurrencyPolicy"`
 
 	// This flag tells the controller to suspend subsequent executions, it does
 	// not apply to already started executions.  Defaults to false.
+	// +kubebuilder:default=false
 	// +optional
 	Suspend *bool `json:"suspend,omitempty" protobuf:"varint,4,opt,name=suspend"`
 
@@ -489,6 +491,7 @@ type CronJobSpec struct {
 	// This is a pointer to distinguish between explicit zero and not specified.
 	// Defaults to 3.
 	// +kubebuilder:default:=3
+	// +kubebuilder:validation:Minimum=0
 	// +optional
 	SuccessfulJobsHistoryLimit *int32 `json:"successfulJobsHistoryLimit,omitempty" protobuf:"varint,6,opt,name=successfulJobsHistoryLimit"`
 
@@ -496,16 +499,9 @@ type CronJobSpec struct {
 	// This is a pointer to distinguish between explicit zero and not specified.
 	// Defaults to 3.
 	// +kubebuilder:default:=1
+	// +kubebuilder:validation:Minimum=0
 	// +optional
 	FailedJobsHistoryLimit *int32 `json:"failedJobsHistoryLimit,omitempty" protobuf:"varint,7,opt,name=failedJobsHistoryLimit"`
-}
-type JobReference struct {
-	Kind            string    `json:"kind,omitempty" protobuf:"bytes,1,opt,name=kind"`
-	Namespace       string    `json:"namespace,omitempty" protobuf:"bytes,2,opt,name=namespace"`
-	Name            string    `json:"name,omitempty" protobuf:"bytes,3,opt,name=name"`
-	UID             types.UID `json:"uid,omitempty" protobuf:"bytes,4,opt,name=uid,casttype=k8s.io/apimachinery/pkg/types.UID"`
-	APIVersion      string    `json:"apiVersio,omitempty" protobuf:"bytes,5,opt,name=apiVersion"`
-	ResourceVersion string    `json:"resourceVersion,omitempty" protobuf:"bytes,6,opt,name=resourceVersion"`
 }
 
 // CronJobStatus represents the current state of a cron job.
@@ -513,7 +509,7 @@ type CronJobStatus struct {
 	// A list of pointers to currently running jobs.
 	// +optional
 	// +listType=atomic
-	Active []JobReference `json:"active,omitempty" protobuf:"bytes,1,rep,name=active"`
+	Active []v1.ObjectReference `json:"active,omitempty" protobuf:"bytes,1,rep,name=active"`
 
 	// Information when was the last time the job was successfully scheduled.
 	// +optional
