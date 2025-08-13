@@ -53,8 +53,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &batchv1alpha1.JobApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("JobCondition"):
 		return &batchv1alpha1.JobConditionApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("JobReference"):
-		return &batchv1alpha1.JobReferenceApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("JobSpec"):
 		return &batchv1alpha1.JobSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("JobState"):

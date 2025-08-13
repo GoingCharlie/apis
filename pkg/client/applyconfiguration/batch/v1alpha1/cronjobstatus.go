@@ -18,15 +18,16 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // CronJobStatusApplyConfiguration represents a declarative configuration of the CronJobStatus type for use
 // with apply.
 type CronJobStatusApplyConfiguration struct {
-	Active             []JobReferenceApplyConfiguration `json:"active,omitempty"`
-	LastScheduleTime   *v1.Time                         `json:"lastScheduleTime,omitempty"`
-	LastSuccessfulTime *v1.Time                         `json:"lastSuccessfulTime,omitempty"`
+	Active             []v1.ObjectReference `json:"active,omitempty"`
+	LastScheduleTime   *metav1.Time         `json:"lastScheduleTime,omitempty"`
+	LastSuccessfulTime *metav1.Time         `json:"lastSuccessfulTime,omitempty"`
 }
 
 // CronJobStatusApplyConfiguration constructs a declarative configuration of the CronJobStatus type for use with
@@ -38,12 +39,9 @@ func CronJobStatus() *CronJobStatusApplyConfiguration {
 // WithActive adds the given value to the Active field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Active field.
-func (b *CronJobStatusApplyConfiguration) WithActive(values ...*JobReferenceApplyConfiguration) *CronJobStatusApplyConfiguration {
+func (b *CronJobStatusApplyConfiguration) WithActive(values ...v1.ObjectReference) *CronJobStatusApplyConfiguration {
 	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithActive")
-		}
-		b.Active = append(b.Active, *values[i])
+		b.Active = append(b.Active, values[i])
 	}
 	return b
 }
@@ -51,7 +49,7 @@ func (b *CronJobStatusApplyConfiguration) WithActive(values ...*JobReferenceAppl
 // WithLastScheduleTime sets the LastScheduleTime field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the LastScheduleTime field is set to the value of the last call.
-func (b *CronJobStatusApplyConfiguration) WithLastScheduleTime(value v1.Time) *CronJobStatusApplyConfiguration {
+func (b *CronJobStatusApplyConfiguration) WithLastScheduleTime(value metav1.Time) *CronJobStatusApplyConfiguration {
 	b.LastScheduleTime = &value
 	return b
 }
@@ -59,7 +57,7 @@ func (b *CronJobStatusApplyConfiguration) WithLastScheduleTime(value v1.Time) *C
 // WithLastSuccessfulTime sets the LastSuccessfulTime field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the LastSuccessfulTime field is set to the value of the last call.
-func (b *CronJobStatusApplyConfiguration) WithLastSuccessfulTime(value v1.Time) *CronJobStatusApplyConfiguration {
+func (b *CronJobStatusApplyConfiguration) WithLastSuccessfulTime(value metav1.Time) *CronJobStatusApplyConfiguration {
 	b.LastSuccessfulTime = &value
 	return b
 }
